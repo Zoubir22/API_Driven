@@ -86,16 +86,6 @@ API_Driven/
 
 ---
 
-## 🔧 Architecture
-
-```
-HTTP Request → API Gateway → Lambda → EC2 (start/stop/status)
-                    ↑
-              LocalStack (AWS émulé)
-```
-
----
-
 ## ⚠️ Important
 
 - **Port** : LocalStack utilise le port **4566** (vérifiez dans l'onglet PORTS)
@@ -115,5 +105,5 @@ HTTP Request → API Gateway → Lambda → EC2 (start/stop/status)
 
 ---
 
-**Auteur** : Arnaud Louvois 
+**Auteur** : Arnaud Louvois
 **Date** : Février 2026
