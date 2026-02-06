@@ -120,8 +120,7 @@ status:
 ## deploy: Deploy all infrastructure (EC2, Lambda, API Gateway)
 deploy: check-endpoint
 	@echo "$(YELLOW)🔧 Déploiement de l'infrastructure...$(NC)"
-	@chmod +x scripts/create-infrastructure.sh
-	@bash scripts/create-infrastructure.sh
+	@python3 scripts/create-infrastructure.py
 
 # =============================================================================
 # EC2 API Control
