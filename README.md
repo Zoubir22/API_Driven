@@ -115,5 +115,5 @@ HTTP Request → API Gateway → Lambda → EC2 (start/stop/status)
 
 ---
 
-**Auteur** : Zoubir22  
+**Auteur** : Arnaud Louvois 
 **Date** : Février 2026
