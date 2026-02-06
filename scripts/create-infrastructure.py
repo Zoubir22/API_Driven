@@ -169,7 +169,7 @@ apigateway.put_method(
     authorizationType='NONE'
 )
 
-# Create Lambda integration
+# Create Lambda integration for POST
 apigateway.put_integration(
     restApiId=API_ID,
     resourceId=EC2_RESOURCE_ID,
@@ -178,6 +178,25 @@ apigateway.put_integration(
     integrationHttpMethod='POST',
     uri=f'arn:aws:apigateway:{REGION}:lambda:path/2015-03-31/functions/{LAMBDA_ARN}/invocations'
 )
+
+# Create GET method (for browser access)
+apigateway.put_method(
+    restApiId=API_ID,
+    resourceId=EC2_RESOURCE_ID,
+    httpMethod='GET',
+    authorizationType='NONE'
+)
+
+# Create Lambda integration for GET
+apigateway.put_integration(
+    restApiId=API_ID,
+    resourceId=EC2_RESOURCE_ID,
+    httpMethod='GET',
+    type='AWS_PROXY',
+    integrationHttpMethod='POST',
+    uri=f'arn:aws:apigateway:{REGION}:lambda:path/2015-03-31/functions/{LAMBDA_ARN}/invocations'
+)
+print("   GET method added for browser access")
 
 # Deploy API
 apigateway.create_deployment(
