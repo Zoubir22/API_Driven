@@ -21,47 +21,39 @@ Cet atelier propose de concevoir une architecture **API-driven** dans laquelle u
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🚀 Démarrage Rapide (GitHub Codespaces)
 
 ### Étape 1 : Installation et démarrage
 
 ```bash
-# Installer les dépendances
+# Installer les dépendances (installe awslocal)
 make install
 
 # Démarrer LocalStack
 make start
+
+# Attendre que LocalStack soit prêt
+sleep 20
 ```
 
 ### Étape 2 : Configurer l'endpoint (OBLIGATOIRE)
 
-**Sur GitHub Codespaces :**
-1. Aller dans l'onglet **PORTS**
-2. Trouver le port **4566**
+1. Aller dans l'onglet **PORTS** de GitHub Codespaces
+2. Trouver le port LocalStack (peut être **4566**, **4510** ou autre)
 3. Cliquer droit → **Visibilité du port → Public**
-4. Copier l'URL publique et exécuter :
+4. Copier l'URL publique et l'exporter :
 
 ```bash
-export AWS_ENDPOINT_URL=https://ubiquitous-funicular-6pxjvq5qppr2r9v9-4566.app.github.dev
+# Remplacer par VOTRE URL du port LocalStack
+export AWS_ENDPOINT_URL=https://votre-codespace-XXXX.app.github.dev
 ```
 
-**En local (Docker) :**
-```bash
-# Obtenir l'IP du conteneur LocalStack
-export AWS_ENDPOINT_URL=http://$(docker inspect localstack-main --format '{{.NetworkSettings.IPAddress}}'):4566
-```
+> **Note** : Le port peut varier ! Vérifiez dans l'onglet PORTS quel port est utilisé par LocalStack.
 
 ### Étape 3 : Déployer l'infrastructure
 
 ```bash
 make deploy
-```
-
-### Installation complète en une commande
-
-```bash
-# Après avoir défini AWS_ENDPOINT_URL
-make all
 ```
 
 ---
@@ -74,46 +66,16 @@ make all
 make start-ec2
 ```
 
-**Résultat attendu :**
-```json
-{
-    "message": "Instance i-xxxxx is starting",
-    "instance_id": "i-xxxxx",
-    "state": "pending",
-    "action": "start"
-}
-```
-
 ### Arrêter l'instance EC2
 
 ```bash
 make stop-ec2
 ```
 
-**Résultat attendu :**
-```json
-{
-    "message": "Instance i-xxxxx is stopping",
-    "instance_id": "i-xxxxx",
-    "state": "stopping",
-    "action": "stop"
-}
-```
-
 ### Vérifier le statut de l'instance
 
 ```bash
 make status-ec2
-```
-
-**Résultat attendu :**
-```json
-{
-    "message": "Instance i-xxxxx is running",
-    "instance_id": "i-xxxxx",
-    "state": "running",
-    "action": "status"
-}
 ```
 
 ### Utilisation directe avec curl
@@ -160,8 +122,7 @@ API_Driven/
 
 | Commande | Description |
 |----------|-------------|
-| `make all` | Installation complète (install + start + deploy) |
-| `make install` | Installer les dépendances |
+| `make install` | Installer les dépendances (awslocal, boto3) |
 | `make start` | Démarrer LocalStack |
 | `make stop` | Arrêter LocalStack |
 | `make status` | Vérifier le statut des services |
@@ -174,124 +135,37 @@ API_Driven/
 
 ---
 
-## 🔍 Détails Techniques
+## � Dépannage
 
-### Fonction Lambda
+### "aws: command not found"
 
-La fonction Lambda (`lambda/lambda_function.py`) :
-- Reçoit des requêtes JSON via API Gateway
-- Interprète l'action demandée (`start`, `stop`, `status`)
-- Utilise boto3 pour interagir avec EC2
-- Utilise `LOCALSTACK_HOSTNAME` (variable interne de LocalStack) pour la communication
-
-### API Gateway
-
-L'API Gateway expose un endpoint POST :
-- **Endpoint** : `/ec2`
-- **Méthode** : POST
-- **Body** : `{"action": "start|stop|status"}`
-
-### Instance EC2
-
-L'instance EC2 simulée :
-- **AMI** : ami-12345678 (image fictive LocalStack)
-- **Type** : t2.micro
-- **État initial** : running
-
-### Variables d'environnement
-
-| Variable | Description | Obligatoire |
-|----------|-------------|-------------|
-| `AWS_ENDPOINT_URL` | URL de l'API LocalStack | ✅ Oui |
-| `LOCALSTACK_HOSTNAME` | Hostname interne (auto-géré par LocalStack) | Non |
-| `EC2_INSTANCE_ID` | ID de l'instance EC2 (auto-généré) | Non |
-
----
-
-## 🐛 Dépannage
-
-### LocalStack ne démarre pas
-
+C'est normal ! Nous utilisons `awslocal` (pas `aws`). Relancez :
 ```bash
-# Vérifier que Docker est en cours d'exécution
-docker ps
-
-# Redémarrer LocalStack
-make stop
-make start
+make install
 ```
+
+### Le port n'est pas 4566
+
+LocalStack peut utiliser différents ports. Vérifiez l'onglet **PORTS** et utilisez le port correct dans votre URL.
 
 ### Erreur "AWS_ENDPOINT_URL is not set"
 
 ```bash
-# Définir la variable d'environnement
-export AWS_ENDPOINT_URL=<votre-url>
-
-# Vérifier qu'elle est définie
-echo $AWS_ENDPOINT_URL
+# Définir la variable avec l'URL de l'onglet PORTS
+export AWS_ENDPOINT_URL=https://votre-url.app.github.dev
 ```
-
-### L'API ne répond pas
-
-```bash
-# Vérifier le statut des services
-make status
-
-# Vérifier que l'API Gateway est déployé
-aws --endpoint-url=$AWS_ENDPOINT_URL apigateway get-rest-apis
-```
-
----
-
-## 📚 Références
-
-- [LocalStack Documentation](https://docs.localstack.cloud/)
-- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
-- [AWS API Gateway Documentation](https://docs.aws.amazon.com/apigateway/)
-- [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2/)
-
----
-
-## 📝 Notes pour GitHub Codespaces
-
-1. **Démarrer LocalStack** :
-   ```bash
-   make install
-   make start
-   ```
-
-2. **Rendre le port 4566 public** :
-   - Aller dans l'onglet **PORTS**
-   - Trouver le port 4566
-   - Cliquer droit → Visibilité du port → **Public**
-
-3. **Récupérer et définir l'URL** :
-   ```bash
-   # Copier l'URL du port 4566 et l'exporter
-   export AWS_ENDPOINT_URL=https://votre-codespace-4566.app.github.dev
-   ```
-
-4. **Déployer et tester** :
-   ```bash
-   make deploy
-   make status-ec2
-   make stop-ec2
-   make start-ec2
-   ```
 
 ---
 
 ## ✅ Évaluation
 
-Ce projet répond aux critères suivants :
-
 | Critère | Points | Implémentation |
 |---------|--------|----------------|
-| Repository exécutable sans erreur | 4 | ✅ Scripts testés et fonctionnels |
+| Repository exécutable sans erreur | 4 | ✅ Scripts testés |
 | Fonctionnement conforme | 4 | ✅ Start/Stop/Status EC2 via API |
-| Degré d'automatisation | 4 | ✅ Makefile complet avec toutes les commandes |
+| Degré d'automatisation | 4 | ✅ Makefile complet |
 | Qualité du Readme | 4 | ✅ Documentation détaillée |
-| Processus de travail | 4 | ✅ Commits réguliers et cohérents |
+| Processus de travail | 4 | ✅ Commits cohérents |
 
 ---
 

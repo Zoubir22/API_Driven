@@ -30,11 +30,25 @@ export AWS_ACCESS_KEY_ID=test
 export AWS_SECRET_ACCESS_KEY=test
 export AWS_DEFAULT_REGION=$REGION
 
-# Function to run AWS commands with LocalStack endpoint
+# Use awslocal if available, otherwise use aws with endpoint
+if command -v awslocal &> /dev/null; then
+    AWS_CMD="awslocal"
+    echo "📌 Using awslocal command"
+else
+    AWS_CMD="aws --endpoint-url=$ENDPOINT_URL"
+    echo "📌 Using aws CLI with endpoint"
+fi
+
+# Function to run AWS commands
 aws_local() {
-    aws --endpoint-url="$ENDPOINT_URL" "$@"
+    if command -v awslocal &> /dev/null; then
+        awslocal "$@"
+    else
+        aws --endpoint-url="$ENDPOINT_URL" "$@"
+    fi
 }
 
+echo ""
 echo "📦 Step 1: Creating EC2 Instance..."
 # Create a key pair first (required for EC2)
 aws_local ec2 create-key-pair --key-name my-key 2>/dev/null || echo "Key pair already exists"

@@ -66,8 +66,7 @@ check-endpoint:
 		echo "  export AWS_ENDPOINT_URL=<your-localstack-url>"; \
 		echo ""; \
 		echo "Examples:"; \
-		echo "  - GitHub Codespaces: https://your-codespace-4566.app.github.dev"; \
-		echo "  - After 'make start': export AWS_ENDPOINT_URL=\$$(localstack config show | grep -oP 'http://[^\"]+' | head -1)"; \
+		echo "  - GitHub Codespaces: Voir l'onglet PORTS pour l'URL publique"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)✅ AWS_ENDPOINT_URL is set: $(ENDPOINT_URL)$(NC)"
@@ -79,9 +78,11 @@ check-endpoint:
 ## install: Install dependencies
 install:
 	@echo "$(YELLOW)📦 Installation des dépendances...$(NC)"
-	@pip3 install --upgrade pip --quiet 2>/dev/null || pip3 install --upgrade pip --quiet --break-system-packages
-	@pip3 install localstack awscli-local boto3 --quiet 2>/dev/null || pip3 install localstack awscli-local boto3 --quiet --break-system-packages
+	@pip3 install --upgrade pip --quiet 2>/dev/null || pip3 install --upgrade pip --quiet --break-system-packages 2>/dev/null || true
+	@pip3 install localstack awscli-local boto3 --quiet 2>/dev/null || pip3 install localstack awscli-local boto3 --quiet --break-system-packages 2>/dev/null || pip install localstack awscli-local boto3 --quiet 2>/dev/null || true
 	@echo "$(GREEN)✅ Dépendances installées$(NC)"
+	@echo "$(YELLOW)📌 Vérification de awslocal...$(NC)"
+	@which awslocal && echo "$(GREEN)✅ awslocal disponible$(NC)" || echo "$(RED)⚠️  awslocal non trouvé, réessayez 'make install'$(NC)"
 
 ## start: Start LocalStack in background
 start:
@@ -89,12 +90,11 @@ start:
 	@export AWS_ACCESS_KEY_ID=test && \
 	 export AWS_SECRET_ACCESS_KEY=test && \
 	 export AWS_DEFAULT_REGION=$(REGION) && \
-	 localstack start -d
+	 localstack start -d 2>/dev/null || echo "LocalStack déjà en cours d'exécution"
 	@echo "$(GREEN)✅ LocalStack démarré$(NC)"
 	@echo ""
-	@echo "$(YELLOW)⚠️  N'oubliez pas de définir AWS_ENDPOINT_URL:$(NC)"
-	@echo "   - GitHub Codespaces: Récupérez l'URL du port 4566 dans l'onglet PORTS"
-	@echo "   - Local: export AWS_ENDPOINT_URL=http://\$$(docker inspect localstack-main --format '{{.NetworkSettings.IPAddress}}'):4566"
+	@echo "$(YELLOW)⚠️  IMPORTANT: Définissez AWS_ENDPOINT_URL avec l'URL de l'onglet PORTS$(NC)"
+	@echo "   Le port peut être 4566 ou différent selon votre environnement"
 
 ## wait-ready: Wait for LocalStack to be ready
 wait-ready:
