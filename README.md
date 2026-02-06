@@ -60,12 +60,10 @@ Votre mission (si vous l'acceptez) : Concevoir une architecture **API-driven** d
 ---------------------------------------------------  
 ## Processus de travail (résumé)
 
-1. Installation du cluster Kubernetes K3d (Séquence 1)
-2. Installation de Packer et Ansible
-3. Build de l'image customisée (Nginx + index.html)
-4. Import de l'image dans K3d
-5. Déploiement du service dans K3d via Ansible
-6. Ouverture des ports et vérification du fonctionnement
+1. Installation de l'environnement Localstack (Séquence 1)
+2. Création de l'instance EC2
+3. Création des API (+ fonction Lambda)
+4. Ouverture des ports et vérification du fonctionnement
 
 ---------------------------------------------------
 Séquence 4 : Documentation  
